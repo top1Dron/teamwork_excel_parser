@@ -1,4 +1,4 @@
-from io import StringIO
+from io import StringIO, BytesIO
 from itertools import groupby
 from pprint import pprint
 
@@ -18,10 +18,17 @@ class TeamworkExcelParser:
     def get_valid_format(self):
         # excel_file =ExcelFile(self.file.file)
         df = pandas.read_excel(self.file.file)
-        print(df.tail())
         self._group_tasks(df.to_dict(orient="records"))
         new_excel_data = pandas.DataFrame.from_records(self.output_data)
-        new_excel_data.to_excel(self.response_file_name, index=False, header=True)
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        new_excel_data.to_excel(writer, sheet_name='sheetName', index=False, na_rep='NaN', header=True)
+        for column in new_excel_data:
+            column_length = max(new_excel_data[column].astype(str).map(len).max(), len(column))
+            col_idx = new_excel_data.columns.get_loc(column)
+            writer.sheets['sheetName'].set_column(col_idx, col_idx, min(column_length, 50))
+        writer.close()
+        return output
 
     @staticmethod
     def __key_func(k):
