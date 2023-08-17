@@ -37,11 +37,25 @@ class TeamworkExcelParser:
     def __key_func(k):
         return k['Task Id']
 
+    def _get_date_key(self, data):
+        """
+            "Date" format = "08/03/2023"
+            "Date/Time" format = "08/01/2023 17:06"
+        :param data:
+        :return:
+        """
+
+        try:
+            return "Date" if "Date" in data[0] else "Date/Time"
+        except IndexError:
+            return "Date"
+
     def _group_tasks(self, data):
         # sort INFO data by 'company' key.
         data = sorted(data, key=self.__key_func)
-        first_part_data = [log for log in data if log["Date"].day <= 15]
-        second_part_data = [log for log in data if log["Date"].day > 15]
+        date_key = self._get_date_key(data)
+        first_part_data = [log for log in data if log[date_key].day <= 15]
+        second_part_data = [log for log in data if log[date_key].day > 15]
 
         for key, value in groupby(data, self.__key_func):
             value = list(value)
