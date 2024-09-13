@@ -76,15 +76,21 @@ class TeamworkExcelParser:
         self.second_part_data = sorted(self.second_part_data, key=lambda log: log["project"])
         
         hours = sum([log["hours"] for log in self.output_data])
-        self.output_data.append(dict(project="", task_link="", description="", hours=hours, estimated_hours=""))
-        self.output_data.append(dict(project="", task_link="", description="", hours="", estimated_hours=""))
-        self.output_data.append(dict(project="", task_link="", description="До 15 числа", hours="", estimated_hours=""))
+        self.output_data.append(dict(project="", task_link="", description="", 
+                                     hours=hours, estimated_hours="", parent_task_with_task=""))
+        self.output_data.append(dict(project="", task_link="", description="",
+                                     hours="", estimated_hours="", parent_task_with_task=""))
+        self.output_data.append(dict(project="", task_link="", description="До 15 числа",
+                                     hours="", estimated_hours="", parent_task_with_task=""))
         
         self.output_data.extend(self.first_part_data)
         hours = sum([log["hours"] for log in self.first_part_data])
-        self.output_data.append(dict(project="", task_link="", description="", hours=hours, estimated_hours=""))
-        self.output_data.append(dict(project="", task_link="", description="", hours="", estimated_hours=""))
-        self.output_data.append(dict(project="", task_link="", description="После 15 числа", hours="", estimated_hours=""))
+        self.output_data.append(dict(project="", task_link="", description="",
+                                     hours=hours, estimated_hours="", parent_task_with_task=""))
+        self.output_data.append(dict(project="", task_link="", description="",
+                                     hours="", estimated_hours="", parent_task_with_task=""))
+        self.output_data.append(dict(project="", task_link="", description="После 15 числа",
+                                     hours="", estimated_hours="", parent_task_with_task=""))
         self.output_data.extend(self.second_part_data)
         hours = sum([log["hours"] for log in self.second_part_data])
         self.output_data.append(dict(project="", task_link="", description="", hours=hours, estimated_hours=""))
@@ -95,6 +101,8 @@ class TeamworkExcelParser:
             new_row["project"] = group_row["Project"]
             new_row["task_link"] = self.task_link + str(group_row["Task Id"])
             new_row["description"] = group_row["Task"]
+            new_row["parent_task_with_task"] = f"{group_row['Parent Task']} - {group_row['Task']}"
+            new_row["parent_task"] = group_row["Parent Task"]
             if not new_row.get('hours'):
                 new_row["hours"] = float(group_row["Decimal Hours"])
             else:
